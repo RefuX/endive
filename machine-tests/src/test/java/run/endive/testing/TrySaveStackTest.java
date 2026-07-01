@@ -56,6 +56,21 @@ public class TrySaveStackTest {
 
     @ParameterizedTest
     @MethodSource("machineImplementations")
+    public void catchBackwardToLoop(Function<Instance.Builder, Instance.Builder> machineInject) {
+        var instance = machineInject.apply(Instance.builder(MODULE)).build();
+        assertEquals(42, instance.export("catch-backward-to-loop").apply()[0]);
+    }
+
+    @ParameterizedTest
+    @MethodSource("machineImplementations")
+    public void catchBackwardToLoopDrop(
+            Function<Instance.Builder, Instance.Builder> machineInject) {
+        var instance = machineInject.apply(Instance.builder(MODULE)).build();
+        assertEquals(42, instance.export("catch-backward-to-loop-drop").apply()[0]);
+    }
+
+    @ParameterizedTest
+    @MethodSource("machineImplementations")
     public void catchDropsValueAboveTarget(
             Function<Instance.Builder, Instance.Builder> machineInject) {
         var instance = machineInject.apply(Instance.builder(MODULE)).build();

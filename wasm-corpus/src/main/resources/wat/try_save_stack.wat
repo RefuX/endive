@@ -59,6 +59,53 @@
     (i32.add)                    ;; 1000 + 7 = 1007
   )
 
+  ;; Catch branches backward to a loop.
+  (func (export "catch-backward-to-loop") (result i32)
+    (local $count i32)
+    (local $result i32)
+    (i32.const 0)
+    (loop $L (param i32) (result i32)
+      (local.set $result)
+      (local.get $count)
+      (if (then
+        (local.get $result)
+        (return)
+      ))
+      (local.get $count)
+      (i32.const 1)
+      (i32.add)
+      (local.set $count)
+      (try_table (catch $e $L)
+        (call $do_throw (i32.const 42))
+      )
+      (unreachable)
+    )
+  )
+
+  ;; Catch branches backward to a loop, dropping an intermediate value.
+  (func (export "catch-backward-to-loop-drop") (result i32)
+    (local $count i32)
+    (local $result i32)
+    (i32.const 0)
+    (loop $L (param i32) (result i32)
+      (local.set $result)
+      (local.get $count)
+      (if (then
+        (local.get $result)
+        (return)
+      ))
+      (local.get $count)
+      (i32.const 1)
+      (i32.add)
+      (local.set $count)
+      (i32.const 999)                ;; above $L -> must be dropped by catch unwind
+      (try_table (catch $e $L)
+        (call $do_throw (i32.const 42))
+      )
+      (unreachable)
+    )
+  )
+
   ;; Nested try_table with values below both levels
   (func (export "nested-try-values") (result i32)
     (i32.const 1)                ;; below outer try
