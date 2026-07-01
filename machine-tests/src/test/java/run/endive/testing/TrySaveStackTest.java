@@ -53,4 +53,20 @@ public class TrySaveStackTest {
         var instance = machineInject.apply(Instance.builder(MODULE)).build();
         assertEquals(6, instance.export("nested-try-values").apply()[0]);
     }
+
+    @ParameterizedTest
+    @MethodSource("machineImplementations")
+    public void catchDropsValueAboveTarget(
+            Function<Instance.Builder, Instance.Builder> machineInject) {
+        var instance = machineInject.apply(Instance.builder(MODULE)).build();
+        assertEquals(7, instance.export("catch-drops-value-above-target").apply()[0]);
+    }
+
+    @ParameterizedTest
+    @MethodSource("machineImplementations")
+    public void catchKeepsValueBelowTarget(
+            Function<Instance.Builder, Instance.Builder> machineInject) {
+        var instance = machineInject.apply(Instance.builder(MODULE)).build();
+        assertEquals(1007, instance.export("catch-keeps-value-below-target").apply()[0]);
+    }
 }

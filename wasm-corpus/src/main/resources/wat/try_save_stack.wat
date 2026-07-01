@@ -35,6 +35,30 @@
     (i32.add)                    ;; 100 + 205 = 305
   )
 
+  ;; Catch branches to an outer label, dropping a value below the try but above the target.
+  (func (export "catch-drops-value-above-target") (result i32)
+    (block $t (result i32)
+      (i32.const 99)             ;; above $t -> dropped when the catch branches
+      (try_table (catch $e $t)
+        (call $do_throw (i32.const 7))
+      )
+      (unreachable)
+    )                            ;; $t yields the caught 7
+  )
+
+  ;; Like above, but a value below the target label survives the unwind.
+  (func (export "catch-keeps-value-below-target") (result i32)
+    (i32.const 1000)             ;; below $t -> survives
+    (block $t (result i32)
+      (i32.const 99)             ;; above $t -> dropped
+      (try_table (catch $e $t)
+        (call $do_throw (i32.const 7))
+      )
+      (unreachable)
+    )
+    (i32.add)                    ;; 1000 + 7 = 1007
+  )
+
   ;; Nested try_table with values below both levels
   (func (export "nested-try-values") (result i32)
     (i32.const 1)                ;; below outer try
